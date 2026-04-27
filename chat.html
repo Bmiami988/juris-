@@ -2,8 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes, height=device-height" />
   <title>Lexi Chat - Uganda Legal AI Assistant</title>
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2310b981'/%3E%3Ctext x='50' y='70' font-size='50' text-anchor='middle' fill='white' font-family='Arial'%3E⚖%3C/text%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2310b981'/%3E%3Ctext x='50' y='70' font-size='50' text-anchor='middle' fill='white' font-family='Arial'%3E⚖%3C/text%3E%3C/svg%3E">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <style>
@@ -13,30 +16,40 @@
       box-sizing: border-box;
     }
 
+    html, body {
+      height: 100%;
+      position: relative;
+    }
+
     body {
       font-family: 'Inter', sans-serif;
       background: #ffffff;
       color: #1f2937;
-      height: 100vh;
       overflow: hidden;
       position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       width: 100%;
+      height: 100%;
     }
 
     /* Main chat container */
     .chat-container {
       display: flex;
       flex-direction: column;
-      height: 100vh;
+      height: 100%;
       width: 100%;
       max-width: 100%;
       margin: 0 auto;
       background: #ffffff;
+      position: relative;
     }
 
     /* Minimal header */
     .chat-header-minimal {
-      padding: clamp(0.75rem, 3vw, 1rem) clamp(1rem, 4vw, 1.5rem);
+      padding: 12px 16px;
       background: #ffffff;
       border-bottom: 1px solid #e5e7eb;
       display: flex;
@@ -44,47 +57,47 @@
       justify-content: space-between;
       flex-shrink: 0;
       gap: 1rem;
+      z-index: 10;
     }
 
     .logo-minimal {
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: clamp(1rem, 4vw, 1.2rem);
+      font-size: 1.1rem;
       font-weight: 600;
       color: #0f172a;
     }
 
     .logo-minimal i {
-      font-size: clamp(1.2rem, 5vw, 1.4rem);
+      font-size: 1.3rem;
       color: #10b981;
     }
 
     .back-link {
       color: #6b7280;
       text-decoration: none;
-      font-size: clamp(0.75rem, 3vw, 0.85rem);
+      font-size: 0.8rem;
       display: flex;
       align-items: center;
       gap: 5px;
       transition: color 0.2s;
-      padding: 8px 12px;
+      padding: 6px 12px;
       border-radius: 20px;
     }
 
-    .back-link:hover {
+    .back-link:active {
       background: #f3f4f6;
-      color: #10b981;
     }
 
-    /* Chat messages area */
+    /* Chat messages area - takes remaining space */
     .chat-messages {
       flex: 1;
       overflow-y: auto;
-      padding: clamp(1rem, 4vw, 1.5rem);
+      padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 12px;
       scroll-behavior: smooth;
       -webkit-overflow-scrolling: touch;
     }
@@ -129,12 +142,12 @@
     .message-user .bubble {
       background: #10b981;
       color: white;
-      border-radius: 1.5rem;
-      border-bottom-right-radius: 0.25rem;
-      padding: clamp(0.6rem, 2.5vw, 0.75rem) clamp(1rem, 4vw, 1.25rem);
+      border-radius: 20px;
+      border-bottom-right-radius: 4px;
+      padding: 10px 16px;
       max-width: 85%;
-      font-size: clamp(0.875rem, 3.5vw, 0.95rem);
-      line-height: 1.5;
+      font-size: 0.9rem;
+      line-height: 1.45;
       word-wrap: break-word;
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     }
@@ -148,13 +161,13 @@
     .bot-avatar {
       display: flex;
       align-items: flex-start;
-      gap: clamp(8px, 3vw, 12px);
+      gap: 10px;
       max-width: 100%;
     }
 
     .avatar-icon {
-      width: clamp(28px, 5vw, 32px);
-      height: clamp(28px, 5vw, 32px);
+      width: 32px;
+      height: 32px;
       background: #10b981;
       border-radius: 50%;
       display: flex;
@@ -164,7 +177,7 @@
     }
 
     .avatar-icon i {
-      font-size: clamp(0.875rem, 3vw, 1rem);
+      font-size: 1rem;
       color: white;
     }
 
@@ -176,12 +189,12 @@
     .message-bot .bubble {
       background: #f3f4f6;
       color: #1f2937;
-      border-radius: 1.5rem;
-      border-bottom-left-radius: 0.25rem;
-      padding: clamp(0.6rem, 2.5vw, 0.75rem) clamp(1rem, 4vw, 1.25rem);
+      border-radius: 20px;
+      border-bottom-left-radius: 4px;
+      padding: 10px 16px;
       max-width: 100%;
-      font-size: clamp(0.875rem, 3.5vw, 0.95rem);
-      line-height: 1.5;
+      font-size: 0.9rem;
+      line-height: 1.45;
       word-wrap: break-word;
     }
 
@@ -190,16 +203,16 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: clamp(0.6rem, 2.5vw, 0.75rem) clamp(1rem, 4vw, 1.25rem);
+      padding: 10px 16px;
       background: #f3f4f6;
-      border-radius: 1.5rem;
-      border-bottom-left-radius: 0.25rem;
+      border-radius: 20px;
+      border-bottom-left-radius: 4px;
       width: fit-content;
     }
 
     .typing-indicator span {
-      width: clamp(6px, 2vw, 8px);
-      height: clamp(6px, 2vw, 8px);
+      width: 7px;
+      height: 7px;
       background: #9ca3af;
       border-radius: 50%;
       animation: typing 1.4s infinite ease-in-out;
@@ -215,10 +228,10 @@
 
     /* Sources styling */
     .sources {
-      margin-top: 12px;
-      padding-top: 10px;
+      margin-top: 10px;
+      padding-top: 8px;
       border-top: 1px solid #e5e7eb;
-      font-size: clamp(0.65rem, 2.5vw, 0.7rem);
+      font-size: 0.65rem;
     }
 
     .source {
@@ -231,20 +244,21 @@
 
     .source b {
       color: #0f766e;
-      font-size: clamp(0.65rem, 2.5vw, 0.7rem);
+      font-size: 0.65rem;
     }
 
     .source small {
       color: #6b7280;
-      font-size: clamp(0.6rem, 2.3vw, 0.65rem);
+      font-size: 0.6rem;
     }
 
-    /* Input area */
+    /* Input area - CRITICAL FIX for Samsung */
     .chat-input-area {
-      padding: clamp(0.75rem, 3vw, 1rem) clamp(1rem, 4vw, 1.5rem) clamp(1rem, 4vw, 1.5rem);
+      padding: 12px 16px 20px 16px;
       background: #ffffff;
       border-top: 1px solid #e5e7eb;
       flex-shrink: 0;
+      width: 100%;
     }
 
     .input-wrapper {
@@ -253,8 +267,8 @@
       gap: 10px;
       background: #ffffff;
       border: 1px solid #e5e7eb;
-      border-radius: 1.5rem;
-      padding: 0.25rem 0.25rem 0.25rem 1rem;
+      border-radius: 28px;
+      padding: 4px 6px 4px 18px;
       transition: all 0.2s;
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     }
@@ -268,24 +282,26 @@
       flex: 1;
       border: none;
       background: transparent;
-      padding: 0.6rem 0;
+      padding: 12px 0;
       font-family: 'Inter', sans-serif;
-      font-size: clamp(0.875rem, 3.5vw, 0.95rem);
+      font-size: 0.95rem;
       resize: none;
       outline: none;
       max-height: 100px;
+      min-height: 44px;
       line-height: 1.4;
     }
 
     textarea::placeholder {
       color: #9ca3af;
+      font-size: 0.9rem;
     }
 
     .send-btn {
       background: #10b981;
       border: none;
-      width: clamp(36px, 8vw, 40px);
-      height: clamp(36px, 8vw, 40px);
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       color: white;
       cursor: pointer;
@@ -296,9 +312,9 @@
       flex-shrink: 0;
     }
 
-    .send-btn:hover:not(:disabled) {
+    .send-btn:active {
       background: #059669;
-      transform: scale(1.02);
+      transform: scale(0.98);
     }
 
     .send-btn:disabled {
@@ -307,37 +323,77 @@
     }
 
     .input-hint {
-      font-size: clamp(0.6rem, 2.5vw, 0.7rem);
+      font-size: 0.65rem;
       color: #9ca3af;
-      margin-top: 0.6rem;
+      margin-top: 8px;
       text-align: center;
     }
 
     /* Safe area for notches */
     @supports (padding: max(0px)) {
       .chat-header-minimal {
-        padding-top: max(0.75rem, env(safe-area-inset-top));
-        padding-left: max(1rem, env(safe-area-inset-left));
-        padding-right: max(1rem, env(safe-area-inset-right));
+        padding-top: max(12px, env(safe-area-inset-top));
+        padding-left: max(16px, env(safe-area-inset-left));
+        padding-right: max(16px, env(safe-area-inset-right));
       }
       
       .chat-input-area {
-        padding-bottom: max(1rem, env(safe-area-inset-bottom));
-        padding-left: max(1rem, env(safe-area-inset-left));
-        padding-right: max(1rem, env(safe-area-inset-right));
+        padding-bottom: max(20px, env(safe-area-inset-bottom));
+        padding-left: max(16px, env(safe-area-inset-left));
+        padding-right: max(16px, env(safe-area-inset-right));
       }
     }
 
-    /* Landscape mode on phones */
-    @media (max-width: 768px) and (orientation: landscape) {
-      .chat-messages {
-        padding: 0.75rem;
-        gap: 0.75rem;
+    /* Samsung and Android specific fixes */
+    @media (max-width: 768px) {
+      .chat-input-area {
+        padding: 10px 12px 16px 12px;
+      }
+      
+      textarea {
+        font-size: 16px;
+        min-height: 48px;
+      }
+      
+      .send-btn {
+        width: 48px;
+        height: 48px;
       }
       
       .message-user .bubble,
       .bot-content .bubble {
         max-width: 90%;
+      }
+      
+      .bot-avatar {
+        gap: 8px;
+      }
+      
+      .avatar-icon {
+        width: 30px;
+        height: 30px;
+      }
+    }
+
+    /* Landscape mode */
+    @media (max-width: 768px) and (orientation: landscape) {
+      .chat-messages {
+        padding: 10px;
+        gap: 8px;
+      }
+      
+      .chat-input-area {
+        padding: 8px 12px 12px 12px;
+      }
+      
+      textarea {
+        min-height: 40px;
+        padding: 8px 0;
+      }
+      
+      .send-btn {
+        width: 40px;
+        height: 40px;
       }
     }
   </style>
@@ -386,7 +442,8 @@
       function autoResize() {
         if (input) {
           input.style.height = "auto";
-          input.style.height = Math.min(input.scrollHeight, 100) + "px";
+          const newHeight = Math.min(input.scrollHeight, 100);
+          input.style.height = newHeight + "px";
         }
       }
       
@@ -401,9 +458,11 @@
       }
       
       function scrollToBottom() {
-        if (chatMessages) {
-          chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
+        setTimeout(() => {
+          if (chatMessages) {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+          }
+        }, 50);
       }
       
       function addUserMessage(text) {
@@ -548,18 +607,15 @@
       
       // Welcome message
       if (chatMessages.children.length === 0) {
-        addBotMessage("👋 Hello! I'm Lexi, your AI legal assistant for Uganda. Ask me anything about Ugandan law, rights, legal procedures, or the Constitution. How can I help you today?");
+        addBotMessage("👋 Hello! I'm Lexi, an AI legal Awareness assistant for Uganda. Ask me anything about Ugandan law, rights, legal procedures, or the Constitution. How can I help you today?");
       }
       
       input.focus();
       
-      // Handle viewport height on mobile
-      function setVH() {
-        let vh = window.innerHeight * 0.01;
-        document.documentElement.style.setProperty('--vh', `${vh}px`);
-      }
-      setVH();
-      window.addEventListener('resize', setVH);
+      // Fix for mobile keyboard pushing content
+      window.addEventListener('resize', function() {
+        scrollToBottom();
+      });
     })();
   </script>
 </body>
