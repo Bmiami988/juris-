@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>About Lexi - Uganda Legal AI Assistant</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    /* About page specific styles */
+    .about-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #f8fafc;
+    }
+    
+    .about-nav {
+      background: #0f172a;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    
+    .about-nav .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      text-decoration: none;
+    }
+    
+    .about-nav .logo i {
+      font-size: 1.8rem;
+      color: #34d399;
+    }
+    
+    .about-nav .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+    
+    .about-nav .nav-links a {
+      color: #e2e8f0;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    
+    .about-nav .nav-links a:hover, .about-nav .nav-links a.active {
+      color: #6ee7b7;
+    }
+    
+    .about-hero {
+      background: linear-gradient(135deg, #0a2e38 0%, #0f3b42 50%, #1a4a4f 100%);
+      color: white;
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+    
+    .about-hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    
+    .about-hero p {
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto;
+      color: #cbd5e1;
+    }
+    
+    .about-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+    }
+    
+    .mission-section {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+    
+    .mission-section h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #0f172a;
+    }
+    
+    .mission-section p {
+      font-size: 1.1rem;
+      color: #334155;
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    
+    .team-section {
+      margin-bottom: 4rem;
+    }
+    
+    .team-section h2 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      color: #0f172a;
+    }
+    
+    .team-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+    }
+    
+    .team-card {
+      background: white;
+      border-radius: 1rem;
+      padding: 2rem;
+      text-align: center;
+      flex: 1;
+      min-width: 200px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s;
+    }
+    
+    .team-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .team-card i {
+      font-size: 3rem;
+      color: #10b981;
+      margin-bottom: 1rem;
+    }
+    
+    .team-card h3 {
+      margin-bottom: 0.5rem;
+      color: #0f172a;
+    }
+    
+    .team-card p {
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+    
+    .faq-section {
+      background: #f1f5f9;
+      border-radius: 2rem;
+      padding: 2rem;
+      margin-top: 2rem;
+    }
+    
+    .faq-section h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #0f172a;
+    }
+    
+    .faq-item {
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: white;
+      border-radius: 1rem;
+    }
+    
+    .faq-item h3 {
+      color: #0f766e;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+    
+    .faq-item p {
+      color: #334155;
+      line-height: 1.5;
+    }
+    
+    .disclaimer {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      margin-top: 2rem;
+    }
+    
+    .disclaimer p {
+      color: #92400e;
+      margin: 0;
+    }
+    
+    footer {
+      text-align: center;
+      padding: 2rem;
+      background: #0f172a;
+      color: #94a3b8;
+      font-size: 0.8rem;
+    }
+    
+    @media (max-width: 768px) {
+      .about-hero h1 {
+        font-size: 2rem;
+      }
+      .team-grid {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="about-page">
+    <nav class="about-nav">
+      <a href="index.html" class="logo">
+        <i class="fas fa-gavel"></i>
+        <span>Lexi</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="chat.html">AI Chat</a>
+        <a href="about.html" class="active">About</a>
+      </div>
+    </nav>
+
+    <div class="about-hero">
+      <h1>About Lexi</h1>
+      <p>Democratizing legal knowledge for every Ugandan citizen</p>
+    </div>
+
+    <div class="about-content">
+      <div class="mission-section">
+        <h2>Our Mission</h2>
+        <p>Lexi was born from a simple but powerful idea: everyone deserves access to understandable legal information. In Uganda, navigating the legal system can be complex, expensive, and intimidating. We're using artificial intelligence to break down these barriers, providing instant, accurate, and free legal guidance to all Ugandans.</p>
+      </div>
+
+      <div class="team-section">
+        <h2>Powered By</h2>
+        <div class="team-grid">
+          <div class="team-card">
+            <i class="fas fa-brain"></i>
+            <h3>Advanced AI</h3>
+            <p>State-of-the-art language models trained on Ugandan legal texts</p>
+          </div>
+          <div class="team-card">
+            <i class="fas fa-book"></i>
+            <h3>Legal Experts</h3>
+            <p>Reviewed and validated by Ugandan legal professionals</p>
+          </div>
+          <div class="team-card">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <h3>Local Knowledge</h3>
+            <p>Specialized in Ugandan Constitution, Acts, and customary law</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-section">
+        <h2>Frequently Asked Questions</h2>
+        <div class="faq-item">
+          <h3>Is Lexi free to use?</h3>
+          <p>Yes! Lexi is completely free. We believe legal information should be accessible to everyone without barriers.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Is my conversation private?</h3>
+          <p>Absolutely. Your chat sessions are encrypted and we don't store personal data. Each session uses a unique ID that doesn't identify you personally.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Can Lexi replace a lawyer?</h3>
+          <p>No. Lexi provides legal information and general guidance, but it is not a substitute for professional legal advice from a qualified attorney. For complex legal matters, always consult a lawyer.</p>
+        </div>
+        <div class="faq-item">
+          <h3>What legal sources does Lexi use?</h3>
+          <p>Lexi draws from the Ugandan Constitution, The Penal Code Act, The Land Act, The Employment Act, The Children Act, and other statutory laws, plus legal commentary and resources.</p>
+        </div>
+      </div>
+
+      <div class="disclaimer">
+        <p><strong>⚠️ Important Disclaimer:</strong> Lexi is an AI-powered informational tool. While we strive for accuracy, laws change and interpretations vary. Always verify critical legal information with a qualified legal professional. Lexi does not create an attorney-client relationship.</p>
+      </div>
+    </div>
+
+    <footer>
+      <p>© 2025 Lexi AI — Empowering Ugandans with legal knowledge. Not a substitute for legal advice.</p>
+    </footer>
+  </div>
+</body>
+</html>
