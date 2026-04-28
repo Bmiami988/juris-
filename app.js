@@ -3,8 +3,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // API Configuration - Try multiple endpoints
   const API_ENDPOINTS = [
     "https://juris-ai.fastapicloud.dev/ask",
-  
-    "http://localhost:8000/ask"  // Fallback for local development
   ];
   
   let currentApiUrl = API_ENDPOINTS[0];
