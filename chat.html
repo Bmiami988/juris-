@@ -74,6 +74,27 @@
       color: #10b981;
     }
 
+    .status-badge {
+      font-size: 0.7rem;
+      padding: 4px 8px;
+      border-radius: 20px;
+      background: #f3f4f6;
+      color: #6b7280;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .status-badge.online {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-badge.offline {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
     .back-link {
       color: #6b7280;
       text-decoration: none;
@@ -231,12 +252,12 @@
       margin-top: 10px;
       padding-top: 8px;
       border-top: 1px solid #e5e7eb;
-      font-size: 0.65rem;
+      font-size: 0.7rem;
     }
 
     .source {
       background: #f9fafb;
-      padding: 6px 10px;
+      padding: 8px 10px;
       border-radius: 10px;
       margin-top: 6px;
       border-left: 3px solid #10b981;
@@ -244,15 +265,29 @@
 
     .source b {
       color: #0f766e;
-      font-size: 0.65rem;
+      font-size: 0.7rem;
+      display: block;
+      margin-bottom: 4px;
     }
 
     .source small {
       color: #6b7280;
-      font-size: 0.6rem;
+      font-size: 0.65rem;
+      line-height: 1.4;
+      display: block;
     }
 
-    /* Input area - CRITICAL FIX for Samsung */
+    .confidence-badge {
+      display: inline-block;
+      font-size: 0.6rem;
+      padding: 2px 6px;
+      border-radius: 12px;
+      background: #e0e7ff;
+      color: #3730a3;
+      margin-left: 8px;
+    }
+
+    /* Input area */
     .chat-input-area {
       padding: 12px 16px 20px 16px;
       background: #ffffff;
@@ -329,6 +364,17 @@
       text-align: center;
     }
 
+    /* Retry button */
+    .retry-btn {
+      background: none;
+      border: none;
+      color: #10b981;
+      font-size: 0.7rem;
+      cursor: pointer;
+      margin-left: 10px;
+      text-decoration: underline;
+    }
+
     /* Safe area for notches */
     @supports (padding: max(0px)) {
       .chat-header-minimal {
@@ -344,7 +390,7 @@
       }
     }
 
-    /* Samsung and Android specific fixes */
+    /* Mobile fixes */
     @media (max-width: 768px) {
       .chat-input-area {
         padding: 10px 12px 16px 12px;
@@ -405,6 +451,10 @@
         <i class="fas fa-gavel"></i>
         <span>Juris</span>
       </div>
+      <div id="statusBadge" class="status-badge">
+        <i class="fas fa-circle"></i>
+        <span>Connecting...</span>
+      </div>
       <a href="index.html" class="back-link">
         <i class="fas fa-arrow-left"></i> Exit
       </a>
@@ -427,18 +477,69 @@
 
   <script>
     (function() {
-      const API_URL = "https://ug-legal-ai.fastapicloud.dev/ask";
+      // API Configuration - Try multiple endpoints
+      const API_ENDPOINTS = [
+        "https://juris-ai.fastapicloud.dev/ask",
+        "https://ug-legal-ai.fastapicloud.dev/ask",
+        "http://localhost:8000/ask"  // Fallback for local development
+      ];
       
-      const chatMessages = document.getElementById("chat-messages");
-      const input = document.getElementById("input");
-      const sendBtn = document.getElementById("sendBtn");
-      
+      let currentApiUrl = API_ENDPOINTS[0];
       let session_id = localStorage.getItem("session_id");
       if (!session_id) {
         session_id = crypto.randomUUID().slice(0, 8);
         localStorage.setItem("session_id", session_id);
       }
       
+      const chatMessages = document.getElementById("chat-messages");
+      const input = document.getElementById("input");
+      const sendBtn = document.getElementById("sendBtn");
+      const statusBadge = document.getElementById("statusBadge");
+      
+      let retryCount = 0;
+      const MAX_RETRIES = 3;
+      
+      // Update status badge
+      function updateStatus(status, isOnline) {
+        if (statusBadge) {
+          statusBadge.className = `status-badge ${isOnline ? 'online' : 'offline'}`;
+          const icon = statusBadge.querySelector('i');
+          const textSpan = statusBadge.querySelector('span');
+          if (icon) icon.className = `fas fa-circle ${isOnline ? 'fa-circle' : 'fa-exclamation-triangle'}`;
+          if (textSpan) textSpan.textContent = status;
+        }
+      }
+      
+      // Test API connection
+      async function testConnection() {
+        for (const url of API_ENDPOINTS) {
+          try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            
+            const response = await fetch(url.replace('/ask', '/health'), {
+              method: 'GET',
+              signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            
+            if (response.ok) {
+              currentApiUrl = url;
+              updateStatus('Connected', true);
+              console.log(`✅ Connected to: ${currentApiUrl}`);
+              return true;
+            }
+          } catch (err) {
+            console.log(`Failed to connect to ${url}:`, err.message);
+          }
+        }
+        
+        updateStatus('Offline - Check connection', false);
+        return false;
+      }
+      
+      // Auto-resize textarea
       function autoResize() {
         if (input) {
           input.style.height = "auto";
@@ -477,10 +578,11 @@
         scrollToBottom();
       }
       
-      function addBotMessage(text, isHtml = false) {
+      function addBotMessage(text, isHtml = false, confidence = null) {
         const messageGroup = document.createElement("div");
         messageGroup.className = "message-group";
         const content = isHtml ? text : escapeHtml(text).replace(/\n/g, '<br>');
+        const confidenceHtml = confidence ? `<span class="confidence-badge">${Math.round(confidence * 100)}% confidence</span>` : '';
         messageGroup.innerHTML = `
           <div class="message-bot">
             <div class="bot-avatar">
@@ -488,7 +590,10 @@
                 <i class="fas fa-robot"></i>
               </div>
               <div class="bot-content">
-                <div class="bubble">${content}</div>
+                <div class="bubble">
+                  ${content}
+                  ${confidenceHtml}
+                </div>
               </div>
             </div>
           </div>
@@ -529,20 +634,60 @@
       
       function formatSources(sources) {
         if (!sources || !Array.isArray(sources) || sources.length === 0) return "";
-        let html = `<div class="sources"><i class="fas fa-database"></i> <strong>Sources:</strong>`;
+        let html = `<div class="sources"><i class="fas fa-database"></i> <strong>Legal References:</strong>`;
         sources.forEach(src => {
-          let sourceName = src.source || src.title || "Legal reference";
-          let contentSnippet = src.content || src.text || "";
+          let sourceName = src.act_name || src.source || src.title || "Legal reference";
+          let section = src.section ? ` (${src.section})` : '';
+          let contentSnippet = src.content_preview || src.content || src.text || "";
           if (contentSnippet.length > 150) contentSnippet = contentSnippet.substring(0, 150) + "…";
+          let relevance = src.relevance_score ? ` · ${Math.round(src.relevance_score * 100)}% relevant` : '';
           html += `
             <div class="source">
-              <b>📚 ${escapeHtml(sourceName)}</b><br/>
+              <b>📚 ${escapeHtml(sourceName)}${escapeHtml(section)}${relevance}</b>
               <small>${escapeHtml(contentSnippet)}</small>
             </div>
           `;
         });
         html += `</div>`;
         return html;
+      }
+      
+      async function sendMessageWithRetry(question, retries = MAX_RETRIES) {
+        for (let i = 0; i < retries; i++) {
+          try {
+            const response = await fetch(currentApiUrl, {
+              method: "POST",
+              headers: { 
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+              },
+              body: JSON.stringify({
+                question: question,
+                session_id: session_id
+              })
+            });
+            
+            if (response.status === 502 || response.status === 504) {
+              // Bad gateway - try next endpoint
+              console.log(`Got ${response.status}, trying next endpoint...`);
+              const currentIndex = API_ENDPOINTS.indexOf(currentApiUrl);
+              if (currentIndex < API_ENDPOINTS.length - 1) {
+                currentApiUrl = API_ENDPOINTS[currentIndex + 1];
+                continue;
+              }
+              throw new Error(`Server error: ${response.status}`);
+            }
+            
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            return await response.json();
+          } catch (err) {
+            if (i === retries - 1) throw err;
+            await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1))); // Exponential backoff
+          }
+        }
       }
       
       async function sendMessage() {
@@ -558,36 +703,77 @@
         showTyping();
         
         try {
-          const response = await fetch(API_URL, {
-            method: "POST",
-            headers: { 
-              "Content-Type": "application/json",
-              "Accept": "application/json"
-            },
-            body: JSON.stringify({
-              question: question,
-              session_id: session_id
-            })
-          });
+          // Ensure we have a connection
+          const isConnected = await testConnection();
+          if (!isConnected) {
+            throw new Error("No API connection available");
+          }
           
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
-          
-          const data = await response.json();
+          const data = await sendMessageWithRetry(question);
           removeTyping();
           
           let botReply = data.response || "I'm sorry, I couldn't process that request.";
-          addBotMessage(botReply);
+          addBotMessage(botReply, false, data.confidence_score);
           
+          // Show which acts were consulted
+          if (data.acts_consulted && Array.isArray(data.acts_consulted) && data.acts_consulted.length > 0) {
+            const actsHtml = `<div class="sources"><i class="fas fa-book"></i> <strong>Acts Consulted:</strong> ${data.acts_consulted.join(', ')}</div>`;
+            addBotMessage(actsHtml, true);
+          }
+          
+          // Show sources
           if (data.sources && Array.isArray(data.sources) && data.sources.length > 0) {
             const sourcesHtml = formatSources(data.sources);
             addBotMessage(sourcesHtml, true);
           }
           
+          // Show processing time (optional)
+          if (data.processing_time) {
+            console.log(`Response time: ${data.processing_time}s`);
+          }
+          
+          retryCount = 0; // Reset retry count on success
+          
         } catch (err) {
-          console.error(err);
+          console.error("Error:", err);
           removeTyping();
-          let errorMsg = "⚠️ Connection error. Please check your network and try again.";
+          
+          let errorMsg = "⚠️ Unable to connect to the legal AI service. ";
+          
+          if (err.message.includes("502") || err.message.includes("504")) {
+            errorMsg += "The server is temporarily unavailable. Please wait a moment and try again.";
+          } else if (err.message.includes("Failed to fetch")) {
+            errorMsg += "Please check your internet connection.";
+          } else if (err.message.includes("429")) {
+            errorMsg += "Too many requests. Please wait a moment before asking another question.";
+          } else {
+            errorMsg += err.message || "Please try again later.";
+          }
+          
           addBotMessage(errorMsg);
+          
+          // Add retry button
+          const retryGroup = document.createElement("div");
+          retryGroup.className = "message-group";
+          retryGroup.innerHTML = `
+            <div class="message-bot">
+              <div class="bot-avatar">
+                <div class="avatar-icon">
+                  <i class="fas fa-robot"></i>
+                </div>
+                <div class="bot-content">
+                  <button class="retry-btn" onclick="retryLastQuestion()">
+                    <i class="fas fa-redo"></i> Retry
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+          chatMessages.appendChild(retryGroup);
+          scrollToBottom();
+          
+          // Store last question for retry
+          window.lastQuestion = question;
         } finally {
           sendBtn.disabled = false;
           input.disabled = false;
@@ -596,6 +782,20 @@
         }
       }
       
+      // Retry function
+      window.retryLastQuestion = async function() {
+        if (window.lastQuestion) {
+          // Remove retry button
+          const retryButtons = document.querySelectorAll('.retry-btn');
+          retryButtons.forEach(btn => {
+            const parent = btn.closest('.message-group');
+            if (parent) parent.remove();
+          });
+          await sendMessageWithRetry(window.lastQuestion);
+        }
+      };
+      
+      // Event listeners
       input.addEventListener("input", autoResize);
       input.addEventListener("keydown", (e) => {
         if (e.key === "Enter" && !e.shiftKey) {
@@ -605,17 +805,43 @@
       });
       sendBtn.addEventListener("click", sendMessage);
       
+      // Test connection on load
+      testConnection().then(connected => {
+        if (!connected) {
+          addBotMessage("⚠️ **Connection Notice:** I'm having trouble reaching the legal database. Your questions will be queued and I'll respond once connected. You can still ask questions - they'll be sent when connection is restored.");
+        }
+      });
+      
       // Welcome message
       if (chatMessages.children.length === 0) {
-        addBotMessage("👋 Hello! I'm Lexi, an AI legal Awareness assistant for Uganda. Ask me anything about Ugandan law, rights, legal procedures, or the Constitution. How can I help you today?");
+        addBotMessage("👋 **Hello! I'm Juris**, your AI legal assistant for Uganda.\n\nI can help you with questions about:\n• The Constitution of Uganda\n• Penal Code and Criminal Law\n• Land Act and Property Rights\n• Employment Law\n• Marriage, Divorce, and Family Law\n• And 16+ other Ugandan legal acts\n\n**How can I assist you today?**");
       }
       
       input.focus();
+      
+      // Handle online/offline events
+      window.addEventListener('online', () => {
+        testConnection();
+        addBotMessage("✅ Internet connection restored! You can continue asking questions.");
+      });
+      
+      window.addEventListener('offline', () => {
+        updateStatus('Offline', false);
+        addBotMessage("⚠️ You appear to be offline. Please check your internet connection.");
+      });
       
       // Fix for mobile keyboard pushing content
       window.addEventListener('resize', function() {
         scrollToBottom();
       });
+      
+      // Periodic connection check (every 30 seconds)
+      setInterval(() => {
+        if (navigator.onLine) {
+          testConnection();
+        }
+      }, 30000);
+      
     })();
   </script>
 </body>
