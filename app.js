@@ -1,6 +1,6 @@
 // Wait for DOM to fully load before running
 document.addEventListener('DOMContentLoaded', function() {
-  const API_URL = "https://ug-legal-ai.fastapicloud.dev/ask";
+  const API_URL = "https://juris-ai.fastapicloud.dev/ask";
   
   const chatBox = document.getElementById("chat-box");
   const input = document.getElementById("input");
@@ -168,11 +168,11 @@ document.addEventListener('DOMContentLoaded', function() {
       console.error("Error details:", err);
       removeTyping();
       
-      let errorMsg = "⚠️ Connection error. Please check your network or try again later.";
+      let errorMsg = " Connection error. Please check your network or try again later.";
       if (err.message.includes("Failed to fetch")) {
-        errorMsg = "⚠️ Cannot connect to the server. Please check if the API is available.";
+        errorMsg = "Cannot connect to the server. Please check if the API is available.";
       } else if (err.message) {
-        errorMsg = `⚠️ Error: ${err.message}`;
+        errorMsg = `Error: ${err.message}`;
       }
       
       appendMessage(errorMsg, "bot");
@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Welcome message on load
   if (chatBox && chatBox.children.length === 0) {
-    const welcomeMsg = "👋 Hello! I'm Lexi, your AI legal assistant for Uganda. Ask me anything about Ugandan law, rights, or legal procedures. How can I assist you today?";
+    const welcomeMsg = "👋 Hello! I'm Juris, your AI legal assistant for Uganda. Ask me anything about Ugandan law, rights, or legal procedures. How can I assist you today?";
     appendMessage(welcomeMsg, "bot");
   }
   
